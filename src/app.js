@@ -6,23 +6,20 @@ import { testSocketChatRouter } from "./routes/test.socket.chat.router.js";
 import { Server } from "socket.io";
 import handlebars from "express-handlebars";
 import path from "path";
-import { __dirname } from "./utils.js";
+import { __dirname, connectMongo } from "./utils.js";
 const app = express();
 const port = 3000;
 
 const httpServer = app.listen(port, () => {
   console.log(`Example app listening on http://localhost:${port}`);
 });
+connectMongo();
+//mongodb+srv://guillermofergnani:OkOxTsNWTAGM75yw@51380.yhqtnxt.mongodb.net/?retryWrites=true&w=majority
 
 const socketServer = new Server(httpServer);
 let msgs = [];
-//BACK
+
 socketServer.on("connection", (socket) => {
-  //BACK EMITE
-  /* socket.emit("msg_back_to_front", {
-    msg: Date.now() + " hola desde el back al socket",
-  }); */
-  //BACK RECIBE
   socket.on("msg_front_to_back", (msg) => {
     msg = {
       user: msg.user.replace(
@@ -38,12 +35,6 @@ socketServer.on("connection", (socket) => {
     msgs.unshift({ msg });
     socketServer.emit("msg_back_to_front", msgs);
   });
-
-  /* socket.broadcast.emit("msg_back_to_todos_menos_socket", {
-      msg: "hola desde el back a todos menos el socket",
-    });
-
-    socketServer.emit("msg_back_todos", { msg: "hola desde el back a todos" }); */
 });
 
 app.use(express.json());
